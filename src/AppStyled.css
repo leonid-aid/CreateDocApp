@@ -1,0 +1,59 @@
+.highlight {
+    background-color: yellow;
+  }
+
+.FormStyle{
+  display:grid;
+  grid-template-columns: repeat(6,minmax(230px,3px));
+  row-gap: 8px;
+  column-gap: 10px;
+}
+
+
+.selectForm{
+  margin-top: 40px;
+  height: 40px;
+  margin-bottom: 60px;
+}
+#ButtonGenerate{
+  margin-top: 10px;
+  height: 60px;
+  width:300px;
+  background-color: red;
+}
+#headButtons{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+#authBlick{
+  display: flex;
+  flex-direction: column;
+  margin-left: 100px;
+
+}
+
+
+
+
+
+
+/* .FormStyle :nth-child(-n+20){
+  
+}
+
+.FormStyle :nth-child(n+21):nth-child(-n+32){
+
+}
+
+.FormStyle :nth-child(n+33):nth-child(-n+40){
+
+}
+
+.FormStyle :nth-child(n+41):nth-child(-n+58){
+
+}
+
+.FormStyle :nth-child(n+59){
+  
+}  */
