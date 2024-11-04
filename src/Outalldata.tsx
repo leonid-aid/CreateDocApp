@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FormData } from './App'; // Импортируйте ваш интерфейс FormData
 
-const API_URL = 'http://localhost:5000/server'; // Используйте правильный API URL
+const API_URL = 'https://serverfilldoc.onrender.com/server'; // Используйте правильный API URL https://serverfilldoc.onrender.com/server
 
 interface User {
   name: string;
@@ -25,7 +25,7 @@ export const UserList: React.FC<UserListProps> = ({ onUserSelect }) => {
         const response = await axios.get(`${API_URL}/getAllUsers`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('userToken')}`, // Токен, если требуется
-          },
+          }, timeout: 70000,
         });
         setUsers(response.data); // Устанавливаем данные пользователей
         setLoading(false);
@@ -219,6 +219,11 @@ export const UserList: React.FC<UserListProps> = ({ onUserSelect }) => {
                     f31_3: user.f13_3 || '',
                     f41_3: user.f14_3 || '',
                     f51_3: user.f15_3 || '',
+                    replacedBirthDate:user.replacedBirthDate ||'',
+                    replacePassDate:user.replacePassDate||'',
+                    replaceJmbgFrom:user.replaceJmbgFrom||'',
+                    replaceJmbgDo:user.replaceJmbgDo||'',
+                    replaceDateRegisterComp:user.replaceDateRegisterComp||'',
                   };
 
                   onUserSelect(formData); // Передаем данные пользователя в виде FormData

@@ -2,10 +2,10 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { FormData } from './App';
 
-const API_URL = 'http://localhost:5000/server';
+const API_URL = 'https://serverfilldoc.onrender.com/server';/* https://serverfilldoc.onrender.com/server */
 
 const register = async (username: string, password: string) => {
-  const response = await axios.post(`${API_URL}/register`, { username, password });
+  const response = await axios.post(`${API_URL}/register`, { username, password },{ timeout: 70000 });
   if (response.data.token) {
     localStorage.setItem('userToken', response.data.token); // Сохраняем токен
   }
@@ -13,7 +13,7 @@ const register = async (username: string, password: string) => {
 };
 
 const login = async (username:string, password:string) => {
-  const response = await axios.post(`${API_URL}/login`, { username, password });
+  const response = await axios.post(`${API_URL}/login`, { username, password },{ timeout: 70000 });
   if (response.data.token) {
     localStorage.setItem('userToken', response.data.token);
   }
@@ -30,7 +30,7 @@ const savedata=async(userData:FormData):Promise<void>=>{
     await axios.post(`${API_URL}/saveUserData`, userData, {
       headers: {
         Authorization: `Bearer ${token}`,
-      },
+      }, timeout: 70000,
     });
   } catch (error) {
     console.error('Error saving user data:', error);

@@ -6,7 +6,7 @@ import './AppStyled.css';
 import { Login,Register,SaveData } from './registrForms';
 import {UserList} from './Outalldata'
 
-import template_0 from './templates/0 - Punomoc za DOO i Odluku/1.docx';
+import template_0 from  './templates/0 - Punomoc za DOO i Odluku/1.docx';
 import template_1_0 from './templates/1_0 - Godišnja ponuda produženje/1.docx';
 import template_1_1 from './templates/1_1 - Godišnja ponuda prvi/1.docx';
 import template_1_2 from './templates/1_2 - Izjava za platu director/1.docx';
@@ -41,6 +41,7 @@ import template_5_3 from './templates/5_3 - Zahtjev na poresko uverenje/1.docx';
 import template_6_0 from './templates/6_0 - Izjava likvidacija/1.docx';
 import template_6_1 from './templates/6_1 - Punomoć likvidacija/1.docx';
 import { DocumentAttributes } from 'docx';
+import { start } from 'repl';
 
 const templateNames: { [key: string]: string } = {
   template_0:'Punomoc za DOO i Odluku',
@@ -263,6 +264,11 @@ export interface FormData {
   f31_3: string;
   f41_3: string;
   f51_3: string;
+  replacedBirthDate:string;
+  replacePassDate:string;
+  replaceJmbgFrom:string;
+  replaceJmbgDo:string;
+  replaceDateRegisterComp:string;
 }
 
 const App: React.FC = () => {
@@ -420,12 +426,25 @@ const App: React.FC = () => {
       currDate: ' ',
       termDate: ' ',
       month: ' ',
-      f11_3: '  ',
-      f21_3: '  ',
-      f31_3: '  ',
-      f41_3: '  ',
-      f51_3: '  ',
+      f11_3: '',
+      f21_3: '',
+      f31_3: '',
+      f41_3: '',
+      f51_3: '',
+      replacedBirthDate:'',
+      replacePassDate:'',
+      replaceJmbgFrom:'',
+      replaceJmbgDo:'',
+      replaceDateRegisterComp:'',
     });
+
+    const [date,setDate]=useState({
+      replacedBirthDate:'',
+      replacePassDate:'',
+      replaceJmbgFrom:'',
+      replaceJmbgDo:'',
+      replaceDateRegisterComp:'',
+    })
 
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [requiredFields, setRequiredFields] = useState<string[]>([]);
@@ -489,27 +508,61 @@ const App: React.FC = () => {
     setRequiredFields(fields);
   };
 
+  const replacedate=async(date:string)=>{
+    let result:string;
+    result=date.substring(8)+date.substring(4,8)+date.substring(0,4)
+    console.log(result)
 
-  const generateDocument = async () => {
-    if (selectedTemplate === 'template_1_3') {
-      console.log('work template_1_3');
-  
-      setData(prevdata => {
-        const updatedData = {
-          ...prevdata,
-          f11_3: prevdata.famName1 !== ' ' ? ', putna isprava P RUS ' : ' ',
-          f21_3: prevdata.famName2 !== ' ' ? ', putna isprava P RUS ' : ' ',
-          f31_3: prevdata.famName3 !== ' ' ? ', putna isprava P RUS ' : ' ',
-          f41_3: prevdata.famName4 !== ' ' ? ', putna isprava P RUS ' : ' ',
-          f51_3: prevdata.famName5 !== ' ' ? ', putna isprava P RUS ' : ' ',
-        };
-  
-        // После обновления данных сразу вызываем генерацию документа
-        generateWordDocument(updatedData);
-        return updatedData;
-      });
-    }
-  };
+    return result
+  }
+
+const generateDocument = async () => {
+  if (selectedTemplate === 'template_1_3') {
+    console.log('work template_1_3');
+
+    setData(prevData => {
+      const updatedData = {
+        ...prevData,
+        f11_3: prevData.famName1 !== '' ? ', putna isprava P RUS ' : ' ',
+        f21_3: prevData.famName2 !== '' ? ', putna isprava P RUS ' : ' ',
+        f31_3: prevData.famName3 !== '' ? ', putna isprava P RUS ' : ' ',
+        f41_3: prevData.famName4 !== '' ? ', putna isprava P RUS ' : ' ',
+        f51_3: prevData.famName5 !== '' ? ', putna isprava P RUS ' : ' ',
+      };
+      // После обновления данных сразу вызываем генерацию документа
+      generateWordDocument(updatedData);
+      return updatedData;
+    });
+  } else {
+    // Ожидаем завершения всех асинхронных операций перед обновлением состояния
+    const replacedBirthDate = await replacedate(data.birthDate);
+    const replacePassDate = await replacedate(data.issueDate);
+    const replaceJmbgFrom = await replacedate(data.jmbgFrom);
+    const replaceJmbgDo = await replacedate(data.jmbgTo);
+    const replaceDateRegisterComp = await replacedate(data.compRegDate);
+
+    // Устанавливаем данные после завершения всех асинхронных операций
+    setData(prevData => ({
+      ...prevData,
+      replacedBirthDate,
+      replacePassDate,
+      replaceJmbgFrom,
+      replaceJmbgDo,
+      replaceDateRegisterComp,
+    }));
+
+    // Генерация документа с обновлёнными данными
+    generateWordDocument({
+      ...data,
+      replacedBirthDate,
+      replacePassDate,
+      replaceJmbgFrom,
+      replaceJmbgDo,
+      replaceDateRegisterComp,
+    });
+  }
+};
+
   
   const generateWordDocument = async (data:FormData) => {
     const templateFile = templates[selectedTemplate];
@@ -528,7 +581,13 @@ const App: React.FC = () => {
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     });
   
-    saveAs(out, `${selectedTemplate}_document.docx`);
+    if(selectedTemplate==template_1_5||template_4_0){
+    saveAs(out, `${templateNames[selectedTemplate]}_${data.name}_${data.surName}.docx`);
+    }else if(selectedTemplate==template_2_5){
+      saveAs(out, `${templateNames[selectedTemplate]}_${data.compName}.docx`);
+    }else{
+      saveAs(out, `${templateNames[selectedTemplate]}_${data.name}_${data.surName}_${data.compName}.docx`);
+    }
   };
   
 
@@ -541,7 +600,6 @@ const App: React.FC = () => {
   const [showAppComp, setShowAppComp] = useState(false);
   const handleUserDataUpdate = (userData: any) => {
 
-    console.log('UserData received:', userData); // Логирование данных
         setData(userData);
   
         if (userData.id === 1) {
@@ -578,7 +636,6 @@ const App: React.FC = () => {
     if (userData.famJmbgNum5) {
       handleSplitAndSet('famJmbgNum5', userData.famJmbgNum5, ['f51', 'f52', 'f53', 'f54', 'f55', 'f56', 'f57', 'f58', 'f59', 'f510', 'f511', 'f512', 'f513']);
     }
-    console.log(data)
   };
 
  
